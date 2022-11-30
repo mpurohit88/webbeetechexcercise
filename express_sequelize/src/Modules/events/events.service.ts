@@ -1,5 +1,8 @@
-import Event from './entities/event.entity';
+const { Op } = require('sequelize');
+const moment = require('moment');
 
+import Event from './entities/event.entity';
+import Workshop from './entities/workshop.entity';
 
 export class EventsService {
 
@@ -85,7 +88,25 @@ export class EventsService {
      */
 
   async getEventsWithWorkshops() {
-    throw new Error('TODO task 1');
+    try {
+      Workshop.belongsTo(Event, {foreignKey: 'eventId'})
+      Event.hasMany(Workshop, {foreignKey: 'eventId', as: 'workshops'})
+
+      const events = await Event.findAll({
+        order: [
+                [{ model: Workshop, as: 'workshops' },
+                'id',
+                'asc'
+                ]
+              ], 
+        include: [{model: Workshop, as: 'workshops'}] 
+      });
+
+      return events;
+    } catch(err) {
+      console.log("error...", err);
+      return err
+    }
   }
 
   /* TODO: complete getFutureEventWithWorkshops so that it returns events with workshops, that have not yet started
@@ -155,6 +176,25 @@ export class EventsService {
     ```
      */
   async getFutureEventWithWorkshops() {
-    throw new Error('TODO task 2');
+    try {
+      const events = await Event.findAll({
+        order: [
+                [{ model: Workshop, as: 'workshops'},
+                'id',
+                'asc'
+                ]
+              ], 
+        include: [{model: Workshop, as: 'workshops', where: {
+          start: {
+            [Op.gte]: moment().toDate()
+          }
+        },}] 
+      });
+
+      return events;
+    } catch(err) {
+      console.log("error....", err);
+      return err;
+    }
   }
 }

@@ -37,7 +37,7 @@ class EventController extends Controller {
               res.json(data);
           })
           .catch((e: Error) => {
-              next(e);
+              next(e);  
           });
     }
 

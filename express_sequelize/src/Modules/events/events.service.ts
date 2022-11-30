@@ -1,5 +1,4 @@
 const { Op } = require('sequelize');
-const moment = require('moment');
 
 import Event from './entities/event.entity';
 import Workshop from './entities/workshop.entity';
@@ -186,7 +185,7 @@ export class EventsService {
               ], 
         include: [{model: Workshop, as: 'workshops', where: {
           start: {
-            [Op.gte]: moment().toDate()
+            [Op.gte]: new Date()
           }
         },}] 
       });
